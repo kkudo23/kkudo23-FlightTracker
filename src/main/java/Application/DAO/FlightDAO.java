@@ -144,23 +144,32 @@ public class FlightDAO {
      *
      * @param id a flight ID.
      * @param flight a flight object. the flight object does not contain a flight ID.
+     * @return 
      */
-    public void updateFlight(int id, Flight flight){
+    public Flight updateFlight(int id, Flight flight){
         Connection connection = ConnectionUtil.getConnection();
         try {
             //Write SQL logic here
-            String sql = "UPDATE flight SET departure_city = ?, arrival_city = ? WHERE flight_id = ?";
+            String sql = "UPDATE flight SET departure_city=?, arrival_city=? WHERE flight_id=?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-
+    
             //write PreparedStatement setString and setInt methods here.
             preparedStatement.setString(1, flight.getDeparture_city());
             preparedStatement.setString(2, flight.getArrival_city());
             preparedStatement.setInt(3, id);
-
-            preparedStatement.executeUpdate();
+    
+            int rowsAffected = preparedStatement.executeUpdate();
+    
+            // Check if the update was successful
+            if (rowsAffected > 0) {
+                // Return the updated flight
+                Flight updatedFlight = new Flight(id, flight.getDeparture_city(), flight.getArrival_city());
+                return updatedFlight;
+            }
         }catch(SQLException e){
             System.out.println(e.getMessage());
         }
+        return null;
     }
 
     /**
